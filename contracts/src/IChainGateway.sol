@@ -1,5 +1,5 @@
 
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 interface IChainGateway {
     event Locked(address indexed user, uint256 amount, uint256 timestamp);
