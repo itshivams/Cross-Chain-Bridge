@@ -4,13 +4,14 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 
 interface IChainGateway {
     event Locked(address indexed user, uint256 amount, uint256 timestamp, uint256 nonce);
     event Unlocked(address indexed user, uint256 amount, uint256 timestamp);
     
     function lock(uint256 amount, uint256 nonce, bytes calldata signature) external;
-    function unlock(uint256 amount) external;
+    function unlock(uint256 amount, bytes32[] calldata merkleProof) external;
 }
 
 contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
@@ -18,6 +19,7 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
     address public chainBGateway;
     mapping(uint256 => bool) public processedNonces;
     address public immutable trustedSigner;
+    bytes32 public merkleRoot;
 
     constructor(address _tokenA, address _trustedSigner) {
         require(_tokenA != address(0) && _trustedSigner != address(0), "Invalid addresses");
@@ -28,6 +30,10 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
     function setChainBGateway(address _chainBGateway) external onlyOwner {
         require(_chainBGateway != address(0), "Invalid gateway address");
         chainBGateway = _chainBGateway;
+    }
+
+    function setMerkleRoot(bytes32 _merkleRoot) external onlyOwner {
+        merkleRoot = _merkleRoot;
     }
 
     function verifySignature(address user, uint256 amount, uint256 nonce, bytes calldata signature) internal view returns (bool) {
@@ -56,9 +62,13 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
         emit Locked(msg.sender, amount, block.timestamp, nonce);
     }
 
-    function unlock(uint256 amount) external override onlyOwner nonReentrant {
+    function unlock(uint256 amount, bytes32[] calldata merkleProof) external override onlyOwner nonReentrant {
         require(amount > 0, "Amount must be greater than zero");
         require(tokenA.balanceOf(address(this)) >= amount, "Insufficient balance");
+        
+        bytes32 leaf = keccak256(abi.encodePacked(msg.sender, amount));
+        require(MerkleProof.verify(merkleProof, merkleRoot, leaf), "Invalid Merkle proof");
+        
         tokenA.transfer(msg.sender, amount);
         emit Unlocked(msg.sender, amount, block.timestamp);
     }

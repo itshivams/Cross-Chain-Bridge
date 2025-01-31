@@ -4,13 +4,14 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 
 interface IChainGateway {
     event Minted(address indexed user, uint256 amount, uint256 timestamp);
     event Burned(address indexed user, uint256 amount, uint256 timestamp);
     
     function mint(address to, uint256 amount, uint256 nonce, bytes calldata signature) external;
-    function burn(address from, uint256 amount) external;
+    function burn(address from, uint256 amount, bytes32[] calldata merkleProof) external;
 }
 
 contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
@@ -18,6 +19,7 @@ contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
     address public chainAGateway;
     mapping(uint256 => bool) public processedNonces;
     address public immutable trustedSigner;
+    bytes32 public merkleRoot;
 
     constructor(address _tokenB, address _trustedSigner) {
         require(_tokenB != address(0) && _trustedSigner != address(0), "Invalid addresses");
@@ -28,6 +30,10 @@ contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
     function setChainAGateway(address _chainAGateway) external onlyOwner {
         require(_chainAGateway != address(0), "Invalid gateway address");
         chainAGateway = _chainAGateway;
+    }
+
+    function setMerkleRoot(bytes32 _merkleRoot) external onlyOwner {
+        merkleRoot = _merkleRoot;
     }
 
     function mint(address to, uint256 amount, uint256 nonce, bytes calldata signature) external override onlyOwner nonReentrant {
@@ -56,9 +62,13 @@ contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
         }
     }
 
-    function burn(address from, uint256 amount) external override onlyOwner nonReentrant {
+    function burn(address from, uint256 amount, bytes32[] calldata merkleProof) external override onlyOwner nonReentrant {
         require(amount > 0, "Amount must be greater than zero");
         require(tokenB.balanceOf(from) >= amount, "Insufficient balance");
+
+        bytes32 leaf = keccak256(abi.encodePacked(from, amount));
+        require(MerkleProof.verify(merkleProof, merkleRoot, leaf), "Invalid Merkle proof");
+
         require(tokenB.transferFrom(from, address(this), amount), "Burn transfer failed");
         emit Burned(from, amount, block.timestamp);
     }
