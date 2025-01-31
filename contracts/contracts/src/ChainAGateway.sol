@@ -28,6 +28,9 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
 }
 
 
+
+
+
     function setChainBGateway(address _chainBGateway) external onlyOwner {
         require(_chainBGateway != address(0), "Invalid gateway address");
         chainBGateway = _chainBGateway;
