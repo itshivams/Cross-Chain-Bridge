@@ -14,17 +14,19 @@ interface IChainGateway {
 }
 
 contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
-    IERC20 public tokenA;
+    IERC20 public immutable tokenA;
     address public chainBGateway;
     mapping(uint256 => bool) public processedNonces;
-    address public trustedSigner;
+    address public immutable trustedSigner;
 
     constructor(address _tokenA, address _trustedSigner) {
+        require(_tokenA != address(0) && _trustedSigner != address(0), "Invalid addresses");
         tokenA = IERC20(_tokenA);
         trustedSigner = _trustedSigner;
     }
 
     function setChainBGateway(address _chainBGateway) external onlyOwner {
+        require(_chainBGateway != address(0), "Invalid gateway address");
         chainBGateway = _chainBGateway;
     }
 
@@ -33,20 +35,20 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
         bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
         (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-        address recoveredSigner = ecrecover(ethSignedMessageHash, v, r, s);
-        return recoveredSigner == trustedSigner;
+        return ecrecover(ethSignedMessageHash, v, r, s) == trustedSigner;
     }
 
-    function splitSignature(bytes memory sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
+    function splitSignature(bytes calldata sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(sig.length == 65, "Invalid signature length");
         assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
+            r := calldataload(sig.offset)
+            s := calldataload(add(sig.offset, 32))
+            v := byte(0, calldataload(add(sig.offset, 64)))
         }
     }
 
     function lock(uint256 amount, uint256 nonce, bytes calldata signature) external override nonReentrant {
+        require(amount > 0, "Amount must be greater than zero");
         require(!processedNonces[nonce], "Nonce already used");
         require(verifySignature(msg.sender, amount, nonce, signature), "Invalid signature");
         require(tokenA.transferFrom(msg.sender, address(this), amount), "Transfer failed");
@@ -55,6 +57,7 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
     }
 
     function unlock(uint256 amount) external override onlyOwner nonReentrant {
+        require(amount > 0, "Amount must be greater than zero");
         require(tokenA.balanceOf(address(this)) >= amount, "Insufficient balance");
         tokenA.transfer(msg.sender, amount);
         emit Unlocked(msg.sender, amount, block.timestamp);

@@ -14,25 +14,28 @@ interface IChainGateway {
 }
 
 contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
-    IERC20 public tokenB;
+    IERC20 public immutable tokenB;
     address public chainAGateway;
     mapping(uint256 => bool) public processedNonces;
-    address public trustedSigner;
+    address public immutable trustedSigner;
 
     constructor(address _tokenB, address _trustedSigner) {
+        require(_tokenB != address(0) && _trustedSigner != address(0), "Invalid addresses");
         tokenB = IERC20(_tokenB);
         trustedSigner = _trustedSigner;
     }
 
     function setChainAGateway(address _chainAGateway) external onlyOwner {
+        require(_chainAGateway != address(0), "Invalid gateway address");
         chainAGateway = _chainAGateway;
     }
 
     function mint(address to, uint256 amount, uint256 nonce, bytes calldata signature) external override onlyOwner nonReentrant {
+        require(amount > 0, "Amount must be greater than zero");
         require(!processedNonces[nonce], "Nonce already used");
         require(verifySignature(to, amount, nonce, signature), "Invalid signature");
         processedNonces[nonce] = true;
-        tokenB.transfer(to, amount);
+        require(tokenB.transfer(to, amount), "Mint transfer failed");
         emit Minted(to, amount, block.timestamp);
     }
 
@@ -41,22 +44,22 @@ contract ChainBGateway is IChainGateway, Ownable, ReentrancyGuard {
         bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
         (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-        address recoveredSigner = ecrecover(ethSignedMessageHash, v, r, s);
-        return recoveredSigner == trustedSigner;
+        return ecrecover(ethSignedMessageHash, v, r, s) == trustedSigner;
     }
 
-    function splitSignature(bytes memory sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
+    function splitSignature(bytes calldata sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(sig.length == 65, "Invalid signature length");
         assembly {
-            r := mload(add(sig, 32))
-            s := mload(add(sig, 64))
-            v := byte(0, mload(add(sig, 96)))
+            r := calldataload(sig.offset)
+            s := calldataload(add(sig.offset, 32))
+            v := byte(0, calldataload(add(sig.offset, 64)))
         }
     }
 
     function burn(address from, uint256 amount) external override onlyOwner nonReentrant {
+        require(amount > 0, "Amount must be greater than zero");
         require(tokenB.balanceOf(from) >= amount, "Insufficient balance");
-        tokenB.transferFrom(from, address(this), amount);
+        require(tokenB.transferFrom(from, address(this), amount), "Burn transfer failed");
         emit Burned(from, amount, block.timestamp);
     }
 }
