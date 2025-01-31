@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "./oz/ReentrancyGuard.sol";
+import "./oz/MerkleProof.sol";
 
 interface IChainGateway {
     event Locked(address indexed user, uint256 amount, uint256 timestamp, uint256 nonce);
@@ -21,11 +21,12 @@ contract ChainAGateway is IChainGateway, Ownable, ReentrancyGuard {
     address public immutable trustedSigner;
     bytes32 public merkleRoot;
 
-    constructor(address _tokenA, address _trustedSigner) {
-        require(_tokenA != address(0) && _trustedSigner != address(0), "Invalid addresses");
-        tokenA = IERC20(_tokenA);
-        trustedSigner = _trustedSigner;
-    }
+  constructor(address _tokenA, address _trustedSigner) Ownable(msg.sender) {
+    require(_tokenA != address(0) && _trustedSigner != address(0), "Invalid addresses");
+    tokenA = IERC20(_tokenA);
+    trustedSigner = _trustedSigner;
+}
+
 
     function setChainBGateway(address _chainBGateway) external onlyOwner {
         require(_chainBGateway != address(0), "Invalid gateway address");
