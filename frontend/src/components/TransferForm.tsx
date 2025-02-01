@@ -1,185 +1,144 @@
-import React, { useState } from "react";
-import styles from "../styles/TransferForm.module.css";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "@/components/ui/button";
 import {
-  faSearch,
-  faWallet,
-  faBell,
-  faCopy,
-  faExchangeAlt,
-  faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { ArrowRightLeft } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
-const TransferForm = () => {
-  const [fromNetwork, setFromNetwork] = useState("");
-  const [toNetwork, setToNetwork] = useState("");
-  const [sendAmount, setSendAmount] = useState("");
-  const [receiveAmount, setReceiveAmount] = useState("");
-  const [message, setMessage] = useState("");
+const ASSETS = [
+  { id: "eth", name: "Ethereum (ETH)" },
+  { id: "usdt", name: "Tether (USDT)" },
+  { id: "usdc", name: "USD Coin (USDC)" },
+];
 
-  // Function to handle wallet connection
-  const handleConnectWallet = () => {
-    setMessage("Wallet connected successfully!");
-  };
+export const TransferForm = () => {
+  const [amount, setAmount] = useState("");
+  const [sourceChain, setSourceChain] = useState("");
+  const [targetChain, setTargetChain] = useState("");
+  const [selectedAsset, setSelectedAsset] = useState("");
+  const [transferProgress, setTransferProgress] = useState(0);
+  const [isTransferring, setIsTransferring] = useState(false);
+  const { toast } = useToast();
 
-  // Function to swap "From" and "To" networks
-  const handleSwapNetworks = () => {
-    const temp = fromNetwork;
-    setFromNetwork(toNetwork);
-    setToNetwork(temp);
-    setMessage("Networks swapped successfully!");
-  };
-
-  // Function to copy text to clipboard
-  const handleCopy = () => {
-    const textToCopy = "Your wallet address or other text here";
-    navigator.clipboard
-      .writeText(textToCopy)
-      .then(() => {
-        setMessage("Copied to clipboard!");
-      })
-      .catch(() => {
-        setMessage("Failed to copy to clipboard.");
+  const handleTransfer = async () => {
+    setIsTransferring(true);
+    setTransferProgress(0);
+    
+    try {
+      // Simulate transfer progress
+      for (let i = 0; i <= 100; i += 20) {
+        setTransferProgress(i);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      console.log("Transfer:", { amount, sourceChain, targetChain, selectedAsset });
+      
+      toast({
+        title: "Transfer Initiated",
+        description: "Your transfer has been successfully initiated.",
       });
+    } finally {
+      setIsTransferring(false);
+      setTransferProgress(100);
+    }
   };
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Cross-Chain Bridge</h1>
-        <div className={styles.headerRight}>
-          <div className={styles.searchWrapper}>
-            <input
-              type="text"
-              placeholder="Search for a token..."
-              className={styles.searchInput}
-            />
-            <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
-          </div>
-          <div className={styles.wallet}>
-            <FontAwesomeIcon icon={faWallet} />
-            <span>4</span>
-          </div>
-          <FontAwesomeIcon icon={faBell} />
-          <button
-            className={styles.connectButton}
-            onClick={handleConnectWallet}
-          >
-            Connect wallet
-          </button>
-        </div>
-      </header>
-
-      <main>
-        {/* Display messages */}
-        {message && <p className={styles.message}>{message}</p>}
-
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Bridge tokens</h2>
-            <div className={styles.cardActions}>
-              <FontAwesomeIcon
-                icon={faCopy}
-                onClick={handleCopy}
-                style={{ cursor: "pointer" }}
-              />
-              <FontAwesomeIcon
-                icon={faExchangeAlt}
-                onClick={handleSwapNetworks}
-                style={{ cursor: "pointer" }}
-              />
-            </div>
-          </div>
-          <p className={styles.cardText}>
-            Transfer your tokens from one network to another.
-          </p>
-          <Link href="#" passHref>
-            <span className={styles.showMore}>Show more</span>
-          </Link>
-
-          <div className={styles.grid}>
-            <div>
-              <p className={styles.label}>From this network</p>
-              <div className={styles.selectWrapper}>
-                <select
-                  className={styles.select}
-                  value={fromNetwork}
-                  onChange={(e) => setFromNetwork(e.target.value)}
-                >
-                  <option>Select source chain</option>
-                  <option>Ethereum</option>
-                  <option>Polygon</option>
-                  <option>Optimism</option>
-                </select>
-                <FontAwesomeIcon icon={faChevronDown} className={styles.icon} />
-              </div>
-            </div>
-            <div>
-              <p className={styles.label}>To this network</p>
-              <div className={styles.selectWrapper}>
-                <select
-                  className={styles.select}
-                  value={toNetwork}
-                  onChange={(e) => setToNetwork(e.target.value)}
-                >
-                  <option>Select source chain</option>
-                  <option>Ethereum</option>
-                  <option>Polygon</option>
-                  <option>Optimism</option>
-                </select>
-                <FontAwesomeIcon icon={faChevronDown} className={styles.icon} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.grid}>
-            <div>
-              <p className={styles.label}>You send</p>
-              <input
-                type="text"
-                className={styles.input}
-                value={sendAmount}
-                onChange={(e) => setSendAmount(e.target.value)}
-              />
-            </div>
-            <div>
-              <p className={styles.label}>You receive</p>
-              <input
-                type="text"
-                className={styles.input}
-                value={receiveAmount}
-                onChange={(e) => setReceiveAmount(e.target.value)}
-              />
-            </div>
-          </div>
+    <Card className="w-full max-w-md mx-auto bg-white/10 backdrop-blur-lg border-white/20">
+      <CardHeader>
+        <CardTitle>Cross-Chain Transfer</CardTitle>
+        <CardDescription>
+          Transfer assets between different blockchains
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Asset</label>
+          <Select onValueChange={setSelectedAsset}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select asset to transfer" />
+            </SelectTrigger>
+            <SelectContent>
+              {ASSETS.map((asset) => (
+                <SelectItem key={asset.id} value={asset.id}>
+                  {asset.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className={styles.card}>
-          <div className={styles.cardFooter}>
-            <div>
-              <p className={styles.total}>Total (send + gas)</p>
-              <p className={styles.totalAmount}>$0.00</p>
-              <p className={styles.fee}>Includes a 0.875% MetaMask fee</p>
-            </div>
-            <button
-              className={styles.connectButton}
-              onClick={handleConnectWallet}
-            >
-              Connect wallet
-            </button>
-          </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Source Chain</label>
+          <Select onValueChange={setSourceChain}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select source chain" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="amoy">Amoy Testnet</SelectItem>
+              <SelectItem value="sepolia">Sepolia Testnet</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <p className={styles.terms}>
-          By confirming, you agree to MetaMask's
-          <Link href="https://consensys.io/terms-of-use" passHref>
-            <span className={styles.termsLink}>Terms of Use</span>
-          </Link>
-        </p>
-      </main>
-    </div>
+        <div className="flex justify-center py-2">
+          <ArrowRightLeft className="text-muted-foreground" />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Target Chain</label>
+          <Select onValueChange={setTargetChain}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select target chain" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="amoy">Amoy Testnet</SelectItem>
+              <SelectItem value="sepolia">Sepolia Testnet</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Amount</label>
+          <Input
+            type="number"
+            placeholder="Enter amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </div>
+
+        {isTransferring && (
+          <div className="space-y-2">
+            <Progress value={transferProgress} className="w-full" />
+            <p className="text-sm text-center text-muted-foreground">
+              Transfer in progress... {transferProgress}%
+            </p>
+          </div>
+        )}
+
+        <Button
+          className="w-full"
+          onClick={handleTransfer}
+          disabled={!amount || !sourceChain || !targetChain || !selectedAsset || isTransferring}
+        >
+          {isTransferring ? "Transferring..." : "Transfer Assets"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
-
-export default TransferForm;
