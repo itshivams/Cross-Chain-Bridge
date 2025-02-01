@@ -59,13 +59,8 @@ export default function TransferForm() {
             />
             MetaMask
           </button>
-          <button type="button" className={styles.walletButton}>
-            <img
-              src="https://images.seeklogo.com/logo-png/43/1/walletconnect-logo-png_seeklogo-430923.png?v=1957907400795823728"
-              alt="WalletConnect"
-            />
-            <WalletConnector />
-          </button>
+
+          <WalletConnector />
         </div>
       </div>
 
