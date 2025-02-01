@@ -1,22 +1,27 @@
 const hre = require("hardhat");
 
 async function main() {
+  const [deployer] = await hre.ethers.getSigners();
+  console.log(`Deploying contracts using account: ${deployer.address}`);
+
+  console.log("Deploying TokenA...");
   const TokenA = await hre.ethers.getContractFactory("TokenA");
   const tokenA = await TokenA.deploy();
-  await tokenA.deployed();
-  console.log("TokenA deployed to:", tokenA.address);
+  await tokenA.waitForDeployment();
+  const tokenAAddress = await tokenA.getAddress();
+  console.log(`TokenA deployed at: ${tokenAAddress}`);
 
+  console.log("Deploying ChainAGateway...");
   const ChainAGateway = await hre.ethers.getContractFactory("ChainAGateway");
-  const chainAGateway = await ChainAGateway.deploy(tokenA.address);
-  await chainAGateway.deployed();
-  console.log("ChainAGateway deployed to:", chainAGateway.address);
+  const chainAGateway = await ChainAGateway.deploy(tokenAAddress, deployer.address); 
+  await chainAGateway.waitForDeployment();
+  const chainAGatewayAddress = await chainAGateway.getAddress();
+  console.log(`ChainAGateway deployed at: ${chainAGatewayAddress}`);
 
-
+  console.log("✅ Deployment completed successfully!");
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+main().catch((error) => {
+  console.error("Deployment failed:", error);
+  process.exit(1);
+});
