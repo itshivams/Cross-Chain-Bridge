@@ -1,0 +1,161 @@
+/* Wrap everything in a container class */
+.formContainer {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #000000;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgb(0, 0, 0);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.walletButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.walletButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #505050;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.walletButton:hover {
+  background: #555;
+  transform: translateY(-2px);
+}
+
+.walletButton img {
+  width: 20px;
+  height: 20px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.tab {
+  padding: 12px 24px;
+  background: #333;
+  color: #aaa;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  background: #444;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.activeTab {
+  background: #555;
+  color: #fff;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.field label {
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #ddd;
+}
+
+.field select,
+.field input {
+  padding: 12px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.field select:hover,
+.field input:hover {
+  border-color: #666;
+}
+
+.field select:focus,
+.field input:focus {
+  border-color: #888;
+  outline: none;
+}
+
+.field input::placeholder {
+  color: #777;
+}
+
+.error {
+  color: #ff4d4d;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.submitButton {
+  padding: 12px;
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  background: #666;
+  transform: translateY(-2px);
+}
+
+.history {
+  text-align: center;
+  font-size: 16px;
+  color: #aaa;
+  padding: 20px;
+  background: #333;
+  border-radius: 8px;
+  margin-top: 20px;
+}

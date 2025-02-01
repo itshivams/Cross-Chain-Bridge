@@ -1,12 +1,11 @@
-import React from 'react';
-import WalletConnector from '../components/WalletConnector';
+import React from "react";
+import WalletConnector from "../components/WalletConnector";
+import TransferForm from "@/components/TransferForm";
 
 export default function Home() {
   return (
     <div>
-      <h1>Cross-Chain Bridge Demo</h1>
-      <WalletConnector />
-      <p>Navigate to /transfer to do cross-chain lock & mint</p>
+      <TransferForm />
     </div>
   );
 }
