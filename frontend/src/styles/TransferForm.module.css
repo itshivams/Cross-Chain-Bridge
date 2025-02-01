@@ -1,161 +1,239 @@
-/* Wrap everything in a container class */
-.formContainer {
-  max-width: 700px;
-  margin: 50px auto;
-  padding: 30px;
-  background: #000000;
-  color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgb(0, 0, 0);
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 25px;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
 .title {
-  font-size: 28px;
-  font-weight: 600;
-  color: #fff;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
 }
 
-.walletButtons {
+.headerRight {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.walletButton {
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.searchInput {
+  width: 100%;
+  padding-left: 32px;
+  padding-right: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border: 1px solid #000000;
+  border-radius: 8px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #000000;
+}
+
+.wallet {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
-  background: #505050;
-  color: #fff;
-  border: none;
+}
+
+.connectButton {
+  background-color: #3b82f6;
+  color: rgb(0, 0, 0);
+  padding: 8px 16px;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.walletButton:hover {
-  background: #555;
-  transform: translateY(-2px);
-}
-
-.walletButton img {
-  width: 20px;
-  height: 20px;
-}
-
-.tabs {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 25px;
-}
-
-.tab {
-  padding: 12px 24px;
-  background: #333;
-  color: #aaa;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.tab:hover {
-  background: #444;
-  color: #fff;
-  transform: translateY(-2px);
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 24px;
+  color: #000000;
 }
 
-.activeTab {
-  background: #555;
-  color: #fff;
-}
-
-.form {
+.cardHeader {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
-.fieldRow {
-  display: flex;
-  gap: 20px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.field label {
-  margin-bottom: 8px;
-  font-size: 16px;
-  color: #ddd;
-}
-
-.field select,
-.field input {
-  padding: 12px;
-  border: 1px solid #444;
-  border-radius: 8px;
-  background: #333;
-  color: #fff;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-}
-
-.field select:hover,
-.field input:hover {
-  border-color: #666;
-}
-
-.field select:focus,
-.field input:focus {
-  border-color: #888;
-  outline: none;
-}
-
-.field input::placeholder {
-  color: #777;
-}
-
-.error {
-  color: #ff4d4d;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.submitButton {
-  padding: 12px;
-  background: #555;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+.cardTitle {
+  font-size: 20px;
   font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.submitButton:hover {
-  background: #666;
-  transform: translateY(-2px);
-}
-
-.history {
+  color: #000000;
   text-align: center;
-  font-size: 16px;
-  color: #aaa;
-  padding: 20px;
-  background: #333;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+}
+
+.cardText {
+  color: #000000;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.showMore {
+  color: #3b82f6;
+  cursor: pointer;
+  text-align: center;
+  display: block;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.label {
+  margin-bottom: 8px;
+  color: #1e1d1d;
+  text-align: center;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #000000;
   border-radius: 8px;
-  margin-top: 20px;
+  appearance: none;
+}
+
+.icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #000000;
+  border-radius: 8px;
+}
+
+.cardFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.total {
+  font-weight: 600;
+  text-align: center;
+}
+
+.totalAmount {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.fee {
+  font-size: 12px;
+  color: #000000;
+  text-align: center;
+}
+
+.terms {
+  text-align: center;
+  font-size: 12px;
+  color: #ffffff;
+  margin-top: 16px;
+}
+
+.termsLink {
+  color: #3b82f6;
+  cursor: pointer;
+}
+
+.message {
+  color: green;
+  text-align: center;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.cardActions i {
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.cardActions i:hover {
+  color: #0070f3;
+  cursor: pointer;
+}
+
+/* Media Queries for Responsiveness */
+@media (min-width: 600px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .cardHeader {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cardFooter {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+@media (min-width: 900px) {
+  .container {
+    padding: 100px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .cardTitle {
+    font-size: 25px;
+  }
 }
