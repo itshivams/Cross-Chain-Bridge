@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -61,6 +62,29 @@ export const TransferForm = ({ address }: TransferFormProps) => {
     return () => window.removeEventListener("resize", updateUnderline);
   }, [activeTab]);
 
+  const signMessage = async (
+    contractAddress: string,
+    userAddress: string,
+    action: string
+  ) => {
+    try {
+      if (!window.ethereum) throw new Error("MetaMask is not installed");
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const message = `Action: ${action} | Contract: ${contractAddress} | User: ${userAddress}`;
+      const signature = await signer.signMessage(message);
+      return { message, signature, userAddress };
+    } catch (error) {
+      console.error("Signing failed:", error);
+      throw error;
+    }
+  };
+
+
+  const contractAddress = "0x1E05c0521B744bbf303bfD32071AE1B88F2d1bA6";
+
+
   const [lockMintAssetType, setLockMintAssetType] = useState("ERC-20");
   const [lockMintAsset, setLockMintAsset] = useState("");
   const [lockMintValue, setLockMintValue] = useState("");
@@ -73,38 +97,66 @@ export const TransferForm = ({ address }: TransferFormProps) => {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet first.",
+        variant: "destructive",
       });
       return;
     }
 
     setIsLockMinting(true);
-    setLockMintProgress(0);
+    setLockMintProgress(20);
     try {
-      for (let i = 0; i <= 100; i += 20) {
-        setLockMintProgress(i);
-        if (i === 80) {
-          await new Promise((resolve) => setTimeout(resolve, 6000));
-        } else {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-      }
-      console.log("Lock & Mint", {
+     
+      const signedData = await signMessage(
+        contractAddress,
+        address,
+        "LockAsset"
+      );
+
+      const data = {
         assetType: lockMintAssetType,
         asset: lockMintAsset,
         value: lockMintValue,
         receiver: lockMintReceiver,
+        signature: signedData.signature,
+      };
+
+      const response = await fetch("https://server.hackiitk2.itshivam.me/lock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
+
+      const result = await response.json();
+
+      setLockMintProgress(100);
+
+      if (response.ok) {
+        toast({
+          title: result.message, 
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setLockMintProgress(100);
+      console.error("Lock & Mint error:", error);
       toast({
-        title: "Lock & Mint Initiated",
+        title: "Lock & Mint Error",
         description:
-          "Your lock & mint transaction has been successfully initiated.",
+          (error as Error).message ||
+          "An error occurred while processing your transaction.",
+        variant: "destructive",
       });
     } finally {
       setIsLockMinting(false);
-      setLockMintProgress(100);
     }
   };
 
+  
   const [transferAssetType, setTransferAssetType] = useState("ERC-20");
   const [transferAsset, setTransferAsset] = useState("");
   const [transferSourceChain, setTransferSourceChain] = useState("");
@@ -119,37 +171,66 @@ export const TransferForm = ({ address }: TransferFormProps) => {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet first.",
+        variant: "destructive",
       });
       return;
     }
 
     setIsCrossTransferring(true);
-    setCrossTransferProgress(0);
+    setCrossTransferProgress(20);
     try {
-      for (let i = 0; i <= 100; i += 20) {
-        setCrossTransferProgress(i);
-        if (i === 80) {
-          await new Promise((resolve) => setTimeout(resolve, 6000));
-        } else {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-      }
-      console.log("Cross-Chain Transfer", {
+      const signedData = await signMessage(
+        contractAddress,
+        address,
+        "TransferAsset"
+      );
+
+      const data = {
         assetType: transferAssetType,
         asset: transferAsset,
         sourceChain: transferSourceChain,
         targetChain: transferTargetChain,
         value: transferValue,
         receiver: transferReceiver,
-      });
+        signature: signedData.signature,
+      };
+
+      const response = await fetch(
+        "https://server.hackiitk2.itshivam.me/transfer",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await response.json();
+
+      setCrossTransferProgress(100);
+
+      if (response.ok) {
+        toast({
+          title: result.message,
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setCrossTransferProgress(100);
+      console.error("Cross-Chain Transfer error:", error);
       toast({
-        title: "Transfer Initiated",
+        title: "Transfer Error",
         description:
-          "Your cross-chain transfer has been successfully initiated.",
+          (error as Error).message ||
+          "An error occurred while processing your transaction.",
+        variant: "destructive",
       });
     } finally {
       setIsCrossTransferring(false);
-      setCrossTransferProgress(100);
     }
   };
 
@@ -160,11 +241,68 @@ export const TransferForm = ({ address }: TransferFormProps) => {
   const [burnProgress, setBurnProgress] = useState(0);
 
   const handleBurnUnlock = async () => {
-    toast({
-      title: "Error",
-      description: "Please lock the asset first to unlock and burn.",
-    });
-    return;
+    if (!address) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsBurning(true);
+    setBurnProgress(20);
+    try {
+      const signedData = await signMessage(
+        contractAddress,
+        address,
+        "UnlockAsset"
+      );
+
+      const data = {
+        assetType: burnAssetType,
+        asset: burnAsset,
+        value: burnValue,
+        signature: signedData.signature,
+      };
+
+      const response = await fetch(
+        "https://server.hackiitk2.itshivam.me/unlock",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await response.json();
+
+      setBurnProgress(100);
+
+      if (response.ok) {
+        toast({
+          title: result.message,
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setBurnProgress(100);
+      console.error("Unlock & Burn error:", error);
+      toast({
+        title: "Unlock & Burn Error",
+        description:
+          (error as Error).message ||
+          "An error occurred while processing your transaction.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBurning(false);
+    }
   };
 
   return (
@@ -221,7 +359,7 @@ export const TransferForm = ({ address }: TransferFormProps) => {
                     : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
-                Cross-Chain Transfer 
+                Cross-Chain Transfer
               </button>
               <button
                 ref={burnUnlockRef}
@@ -232,7 +370,7 @@ export const TransferForm = ({ address }: TransferFormProps) => {
                     : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
-                Unlock & Burn 
+                Unlock & Burn
               </button>
             </div>
             <span
