@@ -15,7 +15,7 @@ This project implements a cross-chain asset transfer system where assets can be 
 - **Backend**: Hosted on [Railway](https://railway.app/).
 - **Frontend**: Hosted on [Vercel](https://hackiitk2.itshivam.me/).
 - **Live Demo**: Please visit [Live Application](https://hackiitk2.itshivam.me/) to test the platform.
-- **Demo Video**: Watch our project demonstration video here: [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v)
+- **Demo Video**: Watch our project demonstration video here: [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v) or [LOOM](https://www.loom.com/share/25421ee5f8bc4d74a8f754533027a946?sid=3c8485e4-81b9-48a0-8161-ce00834c525f)
 - **Smart Contracts Deployed At:**
   - **Sepolia (Ethereum Testnet):** [0x1E05c0521B744bbf303bfD32071AE1B88F2d1bA6](https://sepolia.etherscan.io/address/0x1E05c0521B744bbf303bfD32071AE1B88F2d1bA6#code)
   - **Amoy (Polygon Testnet):** [0xd5d5b65Cecab2F99EAe927c6552F05aEd993832c](https://amoy.polygonscan.com/address/0xd5d5b65Cecab2F99EAe927c6552F05aEd993832c#code)
@@ -233,7 +233,9 @@ We are a dedicated team of blockchain developers, cloud/backend developers, full
 ---
 
 ## Project Demonstration
-Watch our project demonstration video here: [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v)
+Watch our project demonstration video here: 
+- [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v)
+- [Loom](https://www.loom.com/share/25421ee5f8bc4d74a8f754533027a946?sid=3c8485e4-81b9-48a0-8161-ce00834c525f)
 
 ---
 
