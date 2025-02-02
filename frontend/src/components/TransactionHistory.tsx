@@ -25,7 +25,6 @@ type ApiTransaction = {
   value: string;
   gasUsed: string;
   timeStamp: string;
-  // Additional fields from Amoy API (optional)
   confirmations?: string;
   contractAddress?: string;
   cumulativeGasUsed?: string;

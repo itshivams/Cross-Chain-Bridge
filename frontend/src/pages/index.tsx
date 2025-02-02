@@ -119,7 +119,7 @@ const Index = () => {
               <AssetBalance address={address} />
             </div>
             <div className="md:col-span-1">
-              <TransferForm />
+              <TransferForm address={address} />
             </div>
           </div>
 
