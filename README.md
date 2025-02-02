@@ -82,7 +82,8 @@ To verify the correctness of smart contracts and ensure security checks:
    ```
 3. Deploy contracts to the local network:
    ```sh
-   npx hardhat run scripts/deploy.js --network localhost
+   npx hardhat run scripts/deployA.js --network localhost
+   npx hardhat run scripts/deployB.js --network localhost
    ```
 4. Interact with contracts using Hardhat console:
    ```sh
@@ -125,8 +126,8 @@ Ensure you have the following installed:
    ```
 3. Deploy to testnets (Amoy & Sepolia):
    ```sh
-   npx hardhat run scripts/deploy.js --network amoy
-   npx hardhat run scripts/deploy.js --network sepolia
+   npx hardhat run scripts/deployA.js --network amoy
+   npx hardhat run scripts/deployB.js --network sepolia
    ```
 
 ### Running the Frontend
