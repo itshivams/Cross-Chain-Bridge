@@ -7,6 +7,7 @@ import { TransactionHistory } from "@/components/TransactionHistory";
 
 const Index = () => {
   const [address, setAddress] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
   const connectWallet = async () => {
@@ -19,8 +20,14 @@ const Index = () => {
       return;
     }
 
+    if (isConnecting) return; // Prevent multiple simultaneous requests
+    setIsConnecting(true);
+
     try {
-      const accounts: string[] = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts: string[] = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
       if (accounts.length > 0) {
         setAddress(accounts[0]);
         toast({
@@ -28,19 +35,32 @@ const Index = () => {
           description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
         });
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to connect wallet",
-      });
+    } catch (error: any) {
+      if (error.code === -32002) {
+        toast({
+          variant: "destructive",
+          title: "Pending Request",
+          description: "A connection request is already pending. Please check MetaMask.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to connect wallet",
+        });
+      }
+    } finally {
+      setIsConnecting(false);
     }
   };
 
   useEffect(() => {
     const checkConnectedWallet = async () => {
       if (window.ethereum) {
-        const accounts: string[] = await window.ethereum.request({ method: "eth_accounts" });
+        const accounts: string[] = await window.ethereum.request({
+          method: "eth_accounts",
+        });
+
         if (accounts.length > 0) {
           setAddress(accounts[0]);
         }
@@ -48,6 +68,15 @@ const Index = () => {
     };
 
     checkConnectedWallet();
+
+    // Listen for account changes
+    window.ethereum?.on("accountsChanged", (accounts: string[]) => {
+      setAddress(accounts.length > 0 ? accounts[0] : null);
+    });
+
+    return () => {
+      window.ethereum?.removeListener("accountsChanged", () => {});
+    };
   }, []);
 
   return (
@@ -59,7 +88,7 @@ const Index = () => {
             Cross-Chain Bridge
           </h1>
           {/* Wallet connection button */}
-          <Button onClick={connectWallet}>
+          <Button onClick={connectWallet} disabled={isConnecting}>
             {address ? "Wallet Connected" : "Connect Wallet"}
           </Button>
         </div>
@@ -80,7 +109,7 @@ const Index = () => {
 
           {/* Bottom Row: Transaction History */}
           <div className="w-full">
-            <TransactionHistory address={address}/>
+            <TransactionHistory address={address} />
           </div>
         </div>
 
