@@ -15,6 +15,7 @@ This project implements a cross-chain asset transfer system where assets can be 
 - **Backend**: Hosted on [Railway](https://railway.app/).
 - **Frontend**: Hosted on [Vercel](https://hackiitk2.itshivam.me/).
 - **Live Demo**: Please visit [Live Application](https://hackiitk2.itshivam.me/) to test the platform.
+- **Demo Video**: Watch our project demonstration video here: [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v)
 - **Smart Contracts Deployed At:**
   - **Sepolia (Ethereum Testnet):** [0x1E05c0521B744bbf303bfD32071AE1B88F2d1bA6](https://sepolia.etherscan.io/address/0x1E05c0521B744bbf303bfD32071AE1B88F2d1bA6#code)
   - **Amoy (Polygon Testnet):** [0xd5d5b65Cecab2F99EAe927c6552F05aEd993832c](https://amoy.polygonscan.com/address/0xd5d5b65Cecab2F99EAe927c6552F05aEd993832c#code)
@@ -204,6 +205,14 @@ Ensure you have the following installed:
 - **Replay Attack Prevention**: Ensures transactions cannot be duplicated.
 - **Gas Optimization**: Efficient execution of transactions.
 
+## Uniqueness
+This cross-chain asset transfer system stands out due to the following unique features:
+- **Fully Decentralized Cross-Chain Mechanism**: Unlike traditional bridges that rely on a third-party, our system uses decentralized relayers and Merkle proof verification.
+- **Gas Optimization Techniques**: Implements efficient transaction processing to reduce gas costs on both chains.
+- **Multi-Layer Security**: Includes reentrancy protection, signature verification, replay attack prevention, and access controls to ensure robust security.
+- **User-Friendly Frontend**: Provides real-time transaction updates, balance fetching, and historical tracking across multiple testnets.
+- **Proof-of-Transfer Mechanism**: Ensures transparent and auditable asset transfers by logging and verifying receipts on-chain.
+
 ## Future Enhancements
 - **Fully Decentralized Relayers**: Remove reliance on centralized infrastructure.
 
@@ -224,9 +233,13 @@ We are a dedicated team of blockchain developers, cloud/backend developers, full
 ---
 
 ## Project Demonstration
-Watch our project demonstration video here: [YouTube](#)
+Watch our project demonstration video here: [YouTube](https://youtu.be/YFeeRKFNd2U?si=uK-lE8oEfKtZt05v)
 
 ---
+
+## GitHub Repository
+You can find the complete source code to the project on GitHub:
+[GitHub Repository](https://github.com/myselfshivams/Cross-Chain-Bridge/)
 
 ## Acknowledgment
 Special thanks to HACKIITK for organizing this hackathon.
