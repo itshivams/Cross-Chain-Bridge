@@ -68,7 +68,7 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
       }
       const data = await res.json();
       setTransactions(data.transactions);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -93,88 +93,94 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
   };
 
   return (
-    <Card className="w-full bg-white/10 backdrop-blur-lg border-white/20">
-      <CardHeader className="flex items-center justify-between">
-        <CardTitle>Transaction History</CardTitle>
+    <Card className="w-full bg-white/10 backdrop-blur-lg border border-transparent rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300">
+      <CardHeader className="flex items-center justify-between border-b border-white/20 pb-4">
+        <CardTitle className="text-xl font-semibold">Transaction History</CardTitle>
         <Button
           variant="ghost"
           onClick={fetchTransactions}
           title="Refresh transactions"
-          className="p-2 hover:rotate-180 transition-transform"
+          className="p-2 hover:rotate-180 transition-transform duration-300"
         >
           <FiRefreshCw size={20} />
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         {loading ? (
- 
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
+          <div className="space-y-3">
+            <Skeleton className="h-8 w-full rounded-md animate-pulse" />
+            <Skeleton className="h-8 w-full rounded-md animate-pulse" />
+            <Skeleton className="h-8 w-full rounded-md animate-pulse" />
           </div>
         ) : error ? (
-          <p className="text-red-500">{error}</p>
+          <p className="text-red-500 font-medium">{error}</p>
         ) : (
           <>
-            <Table>
-              <TableHeader>
+            <Table className="min-w-full">
+              <TableHeader className="bg-gray-800">
                 <TableRow>
-                  <TableHead>Transaction ID</TableHead>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>From</TableHead>
-                  <TableHead>To</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">Transaction ID</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">Timestamp</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">From</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">To</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">Amount</TableHead>
+                  <TableHead className="px-4 py-2 text-left text-sm font-medium text-gray-300">Status</TableHead>
+                  <TableHead className="px-4 py-2 text-center text-sm font-medium text-gray-300">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {displayedTransactions.map((tx) => (
+                {displayedTransactions.map((tx, idx) => (
                   <React.Fragment key={tx.hash}>
-                    <TableRow>
-                      <TableCell className="font-mono">
+                    <TableRow
+                      className={`hover:bg-gray-700 transition-colors duration-200 ${
+                        idx % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                      }`}
+                    >
+                      <TableCell className="px-4 py-2 font-mono text-white">
                         {trimString(tx.hash, 6, 3)}
                       </TableCell>
-                      <TableCell>{formatTimestamp(tx.timeStamp)}</TableCell>
-                      <TableCell>{trimString(tx.from)}</TableCell>
-                      <TableCell>
+                      <TableCell className="px-4 py-2 text-white">{formatTimestamp(tx.timeStamp)}</TableCell>
+                      <TableCell className="px-4 py-2 text-white">{trimString(tx.from)}</TableCell>
+                      <TableCell className="px-4 py-2 text-white">
                         {tx.to ? trimString(tx.to) : "N/A"}
                       </TableCell>
-                      <TableCell>{tx.value}</TableCell>
-                      <TableCell>
+                      <TableCell className="px-4 py-2 text-white">{tx.value}</TableCell>
+                      <TableCell className="px-4 py-2">
                         <Badge variant={tx.to ? "default" : "secondary"}>
-                          {tx.to ? "completed" : "pending"}
+                          {tx.to ? "Completed" : "Pending"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <Button size="sm" onClick={() => toggleExpand(tx.hash)}>
+                      <TableCell className="px-4 py-2 text-center">
+                        <Button
+                          size="sm"
+                          onClick={() => toggleExpand(tx.hash)}
+                          className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+                        >
                           {expandedTx === tx.hash ? "Less Info" : "More Info"}
                         </Button>
                       </TableCell>
                     </TableRow>
                     {expandedTx === tx.hash && (
-                      <TableRow key={`${tx.hash}-expanded`}>
-                        <TableCell colSpan={7}>
-                          <div className="bg-gray-800 p-4 rounded">
-                            <p>
-                              <strong>Transaction Hash:</strong> {tx.hash}
+                      <TableRow>
+                        <TableCell colSpan={7} className="px-4 py-3 bg-gray-800">
+                          <div className="bg-gray-900 p-4 rounded-md transition-all duration-300">
+                            <p className="text-sm text-gray-300">
+                              <strong>Transaction Hash:</strong> <span className="font-mono">{tx.hash}</span>
                             </p>
-                            <p>
+                            <p className="text-sm text-gray-300">
                               <strong>From:</strong> {tx.from}
                             </p>
-                            <p>
+                            <p className="text-sm text-gray-300">
                               <strong>To:</strong> {tx.to || "N/A"}
                             </p>
-                            <p>
+                            <p className="text-sm text-gray-300">
                               <strong>Value:</strong> {tx.value}
                             </p>
-                            <p>
+                            <p className="text-sm text-gray-300">
                               <strong>Gas Used:</strong> {tx.gasUsed}
                             </p>
-                            <p>
-                              <strong>Timestamp:</strong>{" "}
-                              {formatTimestamp(tx.timeStamp)}
+                            <p className="text-sm text-gray-300">
+                              <strong>Timestamp:</strong> {formatTimestamp(tx.timeStamp)}
                             </p>
                           </div>
                         </TableCell>
@@ -186,16 +192,17 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
             </Table>
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-end space-x-2 mt-4">
+              <div className="flex items-center justify-end space-x-4 mt-6">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handlePreviousPage}
                   disabled={currentPage === 1}
+                  className="border-gray-500 text-gray-300 hover:bg-gray-700"
                 >
                   Previous
                 </Button>
-                <span className="text-sm">
+                <span className="text-sm text-gray-300">
                   Page {currentPage} of {totalPages}
                 </span>
                 <Button
@@ -203,6 +210,7 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
                   size="sm"
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
+                  className="border-gray-500 text-gray-300 hover:bg-gray-700"
                 >
                   Next
                 </Button>

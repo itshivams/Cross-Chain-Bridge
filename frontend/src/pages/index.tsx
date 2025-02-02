@@ -20,7 +20,7 @@ const Index = () => {
       return;
     }
 
-    if (isConnecting) return; // Prevent multiple simultaneous requests
+    if (isConnecting) return; 
     setIsConnecting(true);
 
     try {
@@ -54,6 +54,16 @@ const Index = () => {
     }
   };
 
+  const disconnectWallet = () => {
+
+    setAddress(null);
+    toast({
+      variant: "destructive",
+      title: "Wallet Disconnected",
+      description: "You have successfully disconnected your wallet.",
+    });
+  };
+
   useEffect(() => {
     const checkConnectedWallet = async () => {
       if (window.ethereum) {
@@ -69,51 +79,60 @@ const Index = () => {
 
     checkConnectedWallet();
 
-    // Listen for account changes
-    window.ethereum?.on("accountsChanged", (accounts: string[]) => {
+    const handleAccountsChanged = (accounts: string[]) => {
       setAddress(accounts.length > 0 ? accounts[0] : null);
-    });
+    };
+
+    window.ethereum?.on("accountsChanged", handleAccountsChanged);
 
     return () => {
-      window.ethereum?.removeListener("accountsChanged", () => {});
+      window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
     };
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-8">
       <div className="container max-w-7xl mx-auto px-4">
-        {/* Header Section */}
+
         <div className="flex items-center justify-between mb-12">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
             Cross-Chain Bridge
           </h1>
-          {/* Wallet connection button */}
-          <Button onClick={connectWallet} disabled={isConnecting}>
-            {address ? "Wallet Connected" : "Connect Wallet"}
-          </Button>
+          {address ? (
+            <Button
+              onClick={disconnectWallet}
+              disabled={isConnecting}
+              variant="destructive"
+            >
+              Disconnect Wallet
+            </Button>
+          ) : (
+            <Button onClick={connectWallet} disabled={isConnecting}>
+              Connect Wallet
+            </Button>
+          )}
         </div>
 
-        {/* Main Content Grid */}
+        
         <div className="grid gap-8">
-          {/* Top Row: Balance and Transfer Form */}
+ 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Asset Balance Card - Takes up 2 columns */}
+        
             <div className="md:col-span-2">
               <AssetBalance address={address} />
             </div>
-            {/* Transfer Form Card - Takes up 1 column */}
+      
             <div className="md:col-span-1">
               <TransferForm />
             </div>
           </div>
 
-          {/* Bottom Row: Transaction History */}
+    
           <div className="w-full">
             <TransactionHistory address={address} />
           </div>
         </div>
 
-        {/* Footer */}
         <footer className="mt-12 text-center text-sm text-gray-400">
           <p>Cross-Chain Bridge v1.0 @ Developed by Team Airavata</p>
         </footer>
