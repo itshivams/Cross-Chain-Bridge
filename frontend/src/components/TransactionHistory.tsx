@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -47,6 +47,7 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
@@ -89,6 +90,7 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
       }
       setCurrentPage(1);
       setExpandedTx(null);
+      setHasLoaded(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -96,9 +98,7 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
     }
   }, [activeTab, address]);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+
 
   const toggleExpand = (hash: string) => {
     setExpandedTx((prev) => (prev === hash ? null : hash));
@@ -114,8 +114,8 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
 
   return (
     <Card className="w-full bg-white/10 backdrop-blur-lg border border-transparent rounded-xl shadow-2xl transition-shadow duration-300">
-      {/* Header with tabs and refresh button */}
-      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between px-6 pt-6">
+
+      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between px-4 md:px-6 pt-4 md:pt-6">
         <CardTitle className="text-2xl font-bold text-white mb-4 md:mb-0">
           Transaction History
         </CardTitle>
@@ -144,18 +144,33 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
               Amoy
             </Button>
           </div>
-          <Button
-            variant="ghost"
-            onClick={fetchTransactions}
-            title="Refresh transactions"
-            className="p-2 hover:rotate-180 transition-transform duration-300 text-gray-300"
-          >
-            <FiRefreshCw size={24} />
-          </Button>
+  
+          {hasLoaded && (
+            <Button
+              variant="ghost"
+              onClick={fetchTransactions}
+              title="Refresh transactions"
+              className="p-2 hover:rotate-180 transition-transform duration-300 text-gray-300"
+            >
+              <FiRefreshCw size={24} />
+            </Button>
+          )}
         </div>
       </CardHeader>
-      <CardContent className="px-6 pb-6">
-        {loading ? (
+
+      <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
+      
+        {!hasLoaded ? (
+          <div className="flex justify-center items-center py-8">
+            <Button
+              variant="default"
+              onClick={fetchTransactions}
+              className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+            >
+              Load Transaction History
+            </Button>
+          </div>
+        ) : loading ? (
           <div className="space-y-4">
             <Skeleton className="h-10 w-full rounded-md animate-pulse" />
             <Skeleton className="h-10 w-full rounded-md animate-pulse" />
@@ -167,157 +182,174 @@ export const TransactionHistory = ({ address }: TransactionHistoryProps) => {
           <p className="text-gray-300">No transactions found.</p>
         ) : (
           <>
+      
             <div className="overflow-x-auto">
-              <Table className="min-w-full border-separate" style={{ borderSpacing: "0 0.5rem" }}>
-                <TableHeader className="bg-gray-800">
-                  <TableRow>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      Transaction ID
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      Timestamp
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      From
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      To
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      Amount
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
-                      Status
-                    </TableHead>
-                    <TableHead className="px-6 py-3 text-center text-sm font-semibold text-gray-300">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {displayedTransactions.map((tx, idx) => (
-                    <React.Fragment key={tx.hash}>
-                      <TableRow
-                        className={`hover:bg-gray-700 transition-colors duration-200 ${
-                          idx % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
-                        } rounded-md`}
-                      >
-                        <TableCell className="px-6 py-4 font-mono text-white">
-                          {trimString(tx.hash, 6, 3)}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-white">
-                          {formatTimestamp(tx.timeStamp)}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-white">
-                          {trimString(tx.from)}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-white">
-                          {tx.to ? trimString(tx.to) : "N/A"}
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-white">
-                          {tx.value}
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Badge variant={tx.to ? "default" : "secondary"}>
-                            {tx.to ? "Completed" : "Pending"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-center">
-                          <Button
-                            size="sm"
-                            onClick={() => toggleExpand(tx.hash)}
-                            className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
-                          >
-                            {expandedTx === tx.hash ? "Less Info" : "More Info"}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                      {expandedTx === tx.hash && (
-                        <TableRow>
-                          <TableCell colSpan={7} className="px-6 py-4 bg-gray-800 rounded-b-md">
-                            <div className="bg-gray-900 p-4 rounded-md transition-all duration-300 space-y-2">
-                              {activeTab === "amoy" ? (
-                                <>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Transaction Hash:</strong>{" "}
-                                    <span className="font-mono">{tx.hash}</span>
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>From:</strong> {tx.from}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>To:</strong> {tx.to || "N/A"}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Value:</strong> {tx.value}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Gas Used:</strong> {tx.gasUsed}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Gas:</strong> {tx.gas}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Gas Price:</strong> {tx.gasPrice}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Cumulative Gas Used:</strong> {tx.cumulativeGasUsed}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Confirmations:</strong> {tx.confirmations}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Nonce:</strong> {tx.nonce}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Contract Address:</strong>{" "}
-                                    {tx.contractAddress || "N/A"}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Tx Receipt Status:</strong> {tx.txreceipt_status}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Is Error:</strong> {tx.isError}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Timestamp:</strong> {formatTimestamp(tx.timeStamp)}
-                                  </p>
-                                </>
-                              ) : (
-                                <>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Transaction Hash:</strong>{" "}
-                                    <span className="font-mono">{tx.hash}</span>
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>From:</strong> {tx.from}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>To:</strong> {tx.to || "N/A"}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Value:</strong> {tx.value}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Gas Used:</strong> {tx.gasUsed}
-                                  </p>
-                                  <p className="text-sm text-gray-300">
-                                    <strong>Timestamp:</strong> {formatTimestamp(tx.timeStamp)}
-                                  </p>
-                                </>
-                              )}
-                            </div>
+           
+              <div className="inline-block min-w-full">
+                <Table
+                  className="min-w-full border-separate"
+                  style={{ borderSpacing: "0 0.5rem" }}
+                >
+                  <TableHeader className="bg-gray-800">
+                    <TableRow>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        Transaction ID
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        Timestamp
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        From
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        To
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        Amount
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-left text-sm font-semibold text-gray-300">
+                        Status
+                      </TableHead>
+                      <TableHead className="px-6 py-3 text-center text-sm font-semibold text-gray-300">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {displayedTransactions.map((tx, idx) => (
+                      <React.Fragment key={tx.hash}>
+                        <TableRow
+                          className={`hover:bg-gray-700 transition-colors duration-200 ${
+                            idx % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                          } rounded-md`}
+                        >
+                          <TableCell className="px-6 py-4 font-mono text-white whitespace-nowrap">
+                            {trimString(tx.hash, 6, 3)}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-white whitespace-nowrap">
+                            {formatTimestamp(tx.timeStamp)}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-white whitespace-nowrap">
+                            {trimString(tx.from)}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-white whitespace-nowrap">
+                            {tx.to ? trimString(tx.to) : "N/A"}
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-white whitespace-nowrap">
+                            {tx.value}
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <Badge variant={tx.to ? "default" : "secondary"}>
+                              {tx.to ? "Completed" : "Pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-center">
+                            <Button
+                              size="sm"
+                              onClick={() => toggleExpand(tx.hash)}
+                              className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+                            >
+                              {expandedTx === tx.hash ? "Less Info" : "More Info"}
+                            </Button>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
+                        {expandedTx === tx.hash && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={7}
+                              className="px-6 py-4 bg-gray-800 rounded-b-md"
+                            >
+                              <div className="bg-gray-900 p-4 rounded-md transition-all duration-300 space-y-2">
+                                {activeTab === "amoy" ? (
+                                  <>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Transaction Hash:</strong>{" "}
+                                      <span className="font-mono">{tx.hash}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>From:</strong> {tx.from}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>To:</strong> {tx.to || "N/A"}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Value:</strong> {tx.value}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Gas Used:</strong> {tx.gasUsed}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Gas:</strong> {tx.gas}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Gas Price:</strong> {tx.gasPrice}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Cumulative Gas Used:</strong>{" "}
+                                      {tx.cumulativeGasUsed}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Confirmations:</strong>{" "}
+                                      {tx.confirmations}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Nonce:</strong> {tx.nonce}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Contract Address:</strong>{" "}
+                                      {tx.contractAddress || "N/A"}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Tx Receipt Status:</strong>{" "}
+                                      {tx.txreceipt_status}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Is Error:</strong> {tx.isError}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Timestamp:</strong>{" "}
+                                      {formatTimestamp(tx.timeStamp)}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Transaction Hash:</strong>{" "}
+                                      <span className="font-mono">{tx.hash}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>From:</strong> {tx.from}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>To:</strong> {tx.to || "N/A"}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Value:</strong> {tx.value}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Gas Used:</strong> {tx.gasUsed}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      <strong>Timestamp:</strong>{" "}
+                                      {formatTimestamp(tx.timeStamp)}
+                                    </p>
+                                  </>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
-            {/* Pagination Controls */}
+ 
+
+ 
             {totalPages > 1 && (
-              <div className="flex items-center justify-end space-x-4 mt-6">
+              <div className="flex items-center justify-end space-x-4 mt-4 sm:mt-6">
                 <Button
                   variant="outline"
                   size="sm"

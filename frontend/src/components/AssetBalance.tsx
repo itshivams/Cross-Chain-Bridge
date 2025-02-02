@@ -70,49 +70,49 @@ export const AssetBalance = ({ address }: { address: string | null }) => {
   const isLoading = isEthLoading || isAmoyLoading;
 
   return (
-    <Card className="w-full bg-white/10 backdrop-blur-lg border border-white/20 p-6 rounded-xl shadow-lg transition-transform transform hover:scale-105">
+    <Card className="w-full max-w-md md:max-w-2xl mx-auto bg-white/10 backdrop-blur-lg border border-white/20 p-4 md:p-6 rounded-xl shadow-lg transition-transform transform hover:scale-105">
       <CardHeader className="mb-4">
-        <CardTitle className="text-2xl font-bold text-white text-center">
+        <CardTitle className="text-xl md:text-2xl font-bold text-white text-center">
           Asset Balances
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col md:flex-row justify-around items-center gap-8">
-      
+        <div className="flex flex-col md:flex-row justify-around items-center gap-6">
+          {/* Sepolia ETH Balance Card */}
           <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl shadow-md w-full">
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h3 className="text-base md:text-lg font-semibold text-white mb-2">
               Sepolia ETH Balance
             </h3>
             {isEthLoading ? (
-              <Skeleton className="h-12 w-32 rounded-md" />
+              <Skeleton className="h-12 w-28 md:w-32 rounded-md" />
             ) : (
-              <div className="text-3xl font-extrabold text-white transition-all">
+              <div className="text-2xl md:text-3xl font-extrabold text-white transition-all">
                 {balance ? `${balance} ETH` : "N/A"}
               </div>
             )}
           </div>
 
-
+          {/* Amoy Test Balance Card */}
           <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl shadow-md w-full">
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h3 className="text-base md:text-lg font-semibold text-white mb-2">
               Amoy Test Balance
             </h3>
             {isAmoyLoading ? (
-              <Skeleton className="h-12 w-32 rounded-md" />
+              <Skeleton className="h-12 w-28 md:w-32 rounded-md" />
             ) : (
-              <div className="text-3xl font-extrabold text-white transition-all">
+              <div className="text-2xl md:text-3xl font-extrabold text-white transition-all">
                 {amoyBalance ? `${amoyBalance} MOL` : "N/A"}
               </div>
             )}
           </div>
         </div>
 
-  
-        <div className="mt-8 flex justify-center">
+        {/* Fetch Button */}
+        <div className="mt-6 flex justify-center">
           <Button
             onClick={fetchBalances}
             disabled={isLoading}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white font-semibold rounded-full shadow-lg transition-colors duration-300"
+            className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white font-semibold rounded-full shadow-lg transition-colors duration-300"
           >
             {isLoading && (
               <FaSpinner className="animate-spin h-5 w-5 text-white" />

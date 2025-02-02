@@ -20,7 +20,7 @@ const Index = () => {
       return;
     }
 
-    if (isConnecting) return; 
+    if (isConnecting) return;
     setIsConnecting(true);
 
     try {
@@ -55,7 +55,6 @@ const Index = () => {
   };
 
   const disconnectWallet = () => {
-
     setAddress(null);
     toast({
       variant: "destructive",
@@ -70,7 +69,6 @@ const Index = () => {
         const accounts: string[] = await window.ethereum.request({
           method: "eth_accounts",
         });
-
         if (accounts.length > 0) {
           setAddress(accounts[0]);
         }
@@ -92,10 +90,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-8">
-      <div className="container max-w-7xl mx-auto px-4">
-
-        <div className="flex items-center justify-between mb-12">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-12">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-4 sm:mb-0">
             Cross-Chain Bridge
           </h1>
           {address ? (
@@ -113,27 +111,26 @@ const Index = () => {
           )}
         </div>
 
-        
+        {/* Main Content */}
         <div className="grid gap-8">
- 
-          <div className="grid md:grid-cols-3 gap-8">
-        
+          {/* Asset Balance & Transfer Form */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
               <AssetBalance address={address} />
             </div>
-      
             <div className="md:col-span-1">
               <TransferForm />
             </div>
           </div>
 
-    
+          {/* Transaction History */}
           <div className="w-full">
             <TransactionHistory address={address} />
           </div>
         </div>
 
-        <footer className="mt-12 text-center text-sm text-gray-400">
+        {/* Footer */}
+        <footer className="mt-12 text-center text-xs sm:text-sm text-gray-400">
           <p>Cross-Chain Bridge v1.0 @ Developed by Team Airavata</p>
         </footer>
       </div>
