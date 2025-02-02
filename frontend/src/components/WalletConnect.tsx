@@ -2,16 +2,19 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet } from "lucide-react";
 import { useState } from "react";
+import { useWallet } from "../contexts/WalletContext";
 
 declare global {
   interface Window {
     ethereum?: any;
+    onConnect: (address: string) => void;
   }
 }
 
+
 export const WalletConnect = () => {
+  const { address, setAddress } = useWallet();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [address, setAddress] = useState<string | null>(null);
   const { toast } = useToast();
 
   const connectWallet = async () => {

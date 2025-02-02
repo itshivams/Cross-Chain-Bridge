@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { TransferForm } from "@/components/TransferForm";
 import { TransactionHistory } from "@/components/TransactionHistory";
+import { WalletConnect } from "@/components/WalletConnect";
 
 const Index = () => {
   const [address, setAddress] = useState<string | null>(null);
@@ -91,24 +92,22 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-12">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-4 sm:mb-0">
             Cross-Chain Bridge
           </h1>
-          {address ? (
-            <Button
-              onClick={disconnectWallet}
-              disabled={isConnecting}
-              variant="destructive"
-            >
-              Disconnect Wallet
-            </Button>
-          ) : (
-            <Button onClick={connectWallet} disabled={isConnecting}>
-              Connect Wallet
-            </Button>
-          )}
+          <div className="flex items-center gap-4">
+            <WalletConnect onConnect={setAddress} address={address} />
+            {address && (
+              <Button
+                onClick={disconnectWallet}
+                disabled={isConnecting}
+                variant="destructive"
+              >
+                Disconnect Wallet
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Main Content */}
