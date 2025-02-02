@@ -1,11 +1,54 @@
-import { WalletConnect } from "@/components/WalletConnect";
+import { useState, useEffect } from "react";
+import { AssetBalance } from "@/components/AssetBalance";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { TransferForm } from "@/components/TransferForm";
 import { TransactionHistory } from "@/components/TransactionHistory";
-import { AssetBalance } from "@/components/AssetBalance";
-import { useState } from "react";
 
 const Index = () => {
-  const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "MetaMask or any Web3 wallet is not installed",
+      });
+      return;
+    }
+
+    try {
+      const accounts: string[] = await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (accounts.length > 0) {
+        setAddress(accounts[0]);
+        toast({
+          title: "Wallet Connected",
+          description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to connect wallet",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const checkConnectedWallet = async () => {
+      if (window.ethereum) {
+        const accounts: string[] = await window.ethereum.request({ method: "eth_accounts" });
+        if (accounts.length > 0) {
+          setAddress(accounts[0]);
+        }
+      }
+    };
+
+    checkConnectedWallet();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 py-8">
@@ -15,7 +58,10 @@ const Index = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
             Cross-Chain Bridge
           </h1>
-          <WalletConnect />
+          {/* Wallet connection button */}
+          <Button onClick={connectWallet}>
+            {address ? "Wallet Connected" : "Connect Wallet"}
+          </Button>
         </div>
 
         {/* Main Content Grid */}
@@ -24,9 +70,8 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Asset Balance Card - Takes up 2 columns */}
             <div className="md:col-span-2">
-              <AssetBalance address={connectedAddress} />
+              <AssetBalance address={address} />
             </div>
-            
             {/* Transfer Form Card - Takes up 1 column */}
             <div className="md:col-span-1">
               <TransferForm />
@@ -35,13 +80,13 @@ const Index = () => {
 
           {/* Bottom Row: Transaction History */}
           <div className="w-full">
-            <TransactionHistory />
+            <TransactionHistory address={address}/>
           </div>
         </div>
 
         {/* Footer */}
         <footer className="mt-12 text-center text-sm text-gray-400">
-          <p>Cross-Chain Bridge v1.0</p>
+          <p>Cross-Chain Bridge v1.0 @ Developed by Team Airavata</p>
         </footer>
       </div>
     </div>
