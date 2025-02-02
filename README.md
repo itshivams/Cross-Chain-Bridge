@@ -53,7 +53,8 @@ This project implements a cross-chain asset transfer system where assets can be 
    ```
 3. Deploy contracts to the local network:
    ```sh
-   npx hardhat run scripts/deploy.js --network localhost
+   npx hardhat run scripts/deployA.js --network localhost
+   npx hardhat run scripts/deployB.js --network localhost
    ```
 4. Interact with contracts using Hardhat console:
    ```sh
