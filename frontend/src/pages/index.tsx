@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TransferForm } from "@/components/TransferForm";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { WalletConnect } from "@/components/WalletConnect";
+import { RealTimeGraph } from "@/components/RealTimeGraph" 
 
 const Index = () => {
   const [address, setAddress] = useState<string | null>(null);
@@ -109,24 +110,26 @@ const Index = () => {
             )}
           </div>
         </div>
+    
 
-        {/* Main Content */}
         <div className="grid gap-8">
-          {/* Asset Balance & Transfer Form */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <AssetBalance address={address} />
-            </div>
-            <div className="md:col-span-1">
-              <TransferForm address={address} />
-            </div>
-          </div>
-
-          {/* Transaction History */}
-          <div className="w-full">
-            <TransactionHistory address={address} />
-          </div>
+      {/* Asset Balance & Transfer Form */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+          <AssetBalance address={address} />
+        <RealTimeGraph />
         </div>
+        <div className="md:col-span-1">
+          <TransferForm address={address} />
+        </div>
+      </div>
+
+
+      {/* Transaction History */}
+      <div className="w-full">
+        <TransactionHistory address={address} />
+      </div>
+    </div>
 
         {/* Footer */}
         <footer className="mt-12 text-center text-xs sm:text-sm text-gray-400">
